@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
 
     s.add_dependency "jekyll"
     s.add_dependency "natural_sort", "~> 0.3.0"
+    s.add_dependency  "htmlentities", "~> 4.3.3"
     s.add_development_dependency 'bundler'
 
     s.description = <<EOF
