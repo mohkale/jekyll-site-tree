@@ -1,4 +1,3 @@
-require 'rake'
 require_relative './lib/utils/version'
 
 Gem::Specification.new do |s|
@@ -8,9 +7,10 @@ Gem::Specification.new do |s|
     s.licenses = ['GPL-3.0']
     s.authors  = ['mohkale']
     s.email    = 'mohkalsin@gmail.com'
-    s.files    = FileList['lib/**/*.rb']
+    s.require_paths = ["lib"]
 
     s.add_dependency "jekyll"
+    s.add_dependency  "rake"
     s.add_dependency "natural_sort", "~> 0.3.0"
     s.add_dependency  "htmlentities", "~> 4.3.3"
     s.add_development_dependency 'bundler'
