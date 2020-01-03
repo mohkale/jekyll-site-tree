@@ -40,6 +40,14 @@ module Jekyll
       end.uniq.sort(&NaturalSort)
     end
 
+    def include_extension?
+      !!config["extension"]
+    end
+
+    def collapse_paths?
+      !!config['collapse']
+    end
+
     private
 
     def config
@@ -47,11 +55,7 @@ module Jekyll
     end
 
     def site_tree_file
-      config["file"]
-    end
-
-    def include_extension?
-      !!config["extension"]
+      @site_tree_file ||= config["file"]
     end
 
     def excludes
@@ -118,7 +122,7 @@ module Jekyll
         end
 
         unless tree.empty?
-          if tree.length == 1 && !current_path then
+          if collapse_paths? && (tree.length == 1 && !current_path) then
             child_name = tree.keys[0]
 
             return recursive_construct_tree(
