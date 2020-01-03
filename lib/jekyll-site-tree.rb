@@ -94,6 +94,10 @@ module Jekyll
         sub = subs.find { |sub| sub["expr"].match?(link) }
         new = (sub.nil?) ? link : link.gsub(sub["expr"], sub["name"])
 
+        if new.end_with?('/')
+          new += 'index.html'
+        end
+
         unless include_extension?
           new = File.join(File.dirname(new), File.basename(new, '.*'))
         end
