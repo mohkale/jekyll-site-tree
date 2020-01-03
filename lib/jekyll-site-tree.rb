@@ -3,6 +3,8 @@ require 'natural_sort'
 
 module Jekyll
   class SiteTreeGenerator < Jekyll::Generator
+    priority(:lowest)
+
     def generate(site)
       @site = site
 
@@ -23,15 +25,17 @@ module Jekyll
       page.data['site_tree'] = site_tree
     end
 
+    #
+    # get the url of every page in the current site.
     def permalinks
       pages  = @site.pages
       pages += @site.static_files
       pages += @site.collections.map do |tuple|
         name, collection = tuple
-        (collection.write?) ? collection.docs : []
+        collection.docs if collection.write?
       end.flatten
 
-      pages.map { |pg| pg.url }.select do |page|
+      pages.map(&:url).select do |page|
         !excludes.any? { |rx| rx.match? page }
       end.uniq.sort(&NaturalSort)
     end
@@ -51,23 +55,17 @@ module Jekyll
     end
 
     def excludes
-      if @excludes.nil?
-        @excludes = (config["exclude"] || []).map do |exclude|
-          # if exclude begins with a slash, the expression references
-          # an absolute path, otherwise any match is considered valid
-          Regexp.new(exclude[0] == '/' ? '^' + exclude : exclude)
-        end
+      @excludes ||= Array(config["exclude"]).map do |exclude|
+        # if exclude begins with a slash, the expression references
+        # an absolute path, otherwise any match is considered valid
+        Regexp.new(exclude[0] == '/' ? '^' + exclude : exclude)
       end
-      @excludes
     end
 
     def substitutions
-      if @substitutions.nil?
-        @substitutions = (config["substitute"] || []).each do |subs|
-          subs["expr"] = Regexp.new(subs["expr"])
-        end
+      @substitutions ||= Array(config["substitute"]).each do |subs|
+        subs["expr"] = Regexp.new(subs["expr"])
       end
-      @substitutions
     end
 
     def permalink_tuples
@@ -116,7 +114,7 @@ module Jekyll
 
         if current_path
           result += "<a href=\"%s\">%s</a>" % [
-            current_link, name].map { |s| html_coder.encode(s) }
+            html_coder.encode(current_link), html_coder.encode(name)]
         end
 
         unless tree.empty?
