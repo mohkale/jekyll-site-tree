@@ -91,12 +91,14 @@ module Jekyll
       subs = substitutions
 
       permalinks.map do |link|
-        sub = subs.find { |sub| sub["expr"].match?(link) }
-        new = (sub.nil?) ? link : link.gsub(sub["expr"], sub["name"])
-
-        if new.end_with?('/')
-          new += 'index.html'
+        new = link.clone
+        subs.each do |sub|
+          if sub["expr"].match?(new)
+            new.gsub!(sub["expr"], sub["name"])
+          end
         end
+
+        new = new.slice(0..-2) if new.end_with?('/')
 
         unless include_extension?
           new = File.join(File.dirname(new), File.basename(new, '.*'))
