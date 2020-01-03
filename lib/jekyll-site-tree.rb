@@ -8,21 +8,10 @@ module Jekyll
     def generate(site)
       @site = site
 
-      unless site_tree_file
-        Jekyll.logger.warn("SiteTree:", "skipped because no 'site-tree' file specified in config")
-        return
-      end
-
-      page = @site.pages.find { |page| page.dir.slice(1, page.dir.length) + page.name == site_tree_file }
-
-      if page.nil?
-        Jekyll.logger.error("SiteTree:", "unable to find 'site-tree' file: " + site_tree_file)
-        return
-      end
-
       Jekyll.logger.info("SiteTree:", "building site tree")
-      # page.data['site_tree_permalinks'] = permalinks
-      page.data['site_tree'] = site_tree
+      site_tree.tap do |tree|
+        pages.each { |page| page.data['site_tree'] = tree }
+      end
     end
 
     #
@@ -48,14 +37,40 @@ module Jekyll
       !!config['collapse']
     end
 
+    #
+    # get every page in the site as specified by users configuration
+    def pages
+      target_files = site_tree_files
+
+      if target_files.empty?
+        @site.pages # include every page
+      else
+        pages = @site.pages.select do |page|
+          target_files.include?(page.dir.slice(1..) + page.name)
+        end
+
+        unless pages.length == target_files.length
+          # warn when some site_tree target file doesn't exist
+          found = pages.map { |pg| pg.dir.slice(1..) + pg.name }
+
+          # find the set of pages we want to find but didn't and log them
+          ((found | target_files) - (found & target_files)).each do |page|
+            Jekyll.logger.warn("SiteTree:", "unable to find file: " + page)
+          end
+        end
+
+        pages
+      end
+    end
+
     private
 
     def config
       @site.config["site_tree"] || Hash.new
     end
 
-    def site_tree_file
-      @site_tree_file ||= config["file"]
+    def site_tree_files
+      @site_tree_files ||= Array(config["file"]) + Array(config["files"])
     end
 
     def excludes

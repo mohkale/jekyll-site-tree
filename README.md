@@ -37,22 +37,21 @@ You can either:
 see [here](https://jekyllrb.com/docs/plugins/installation/) for a guide on both approaches.
 
 ## How it works?
-This plugin constructs a site-tree on every build and adds it to the local data of some page,
-specified in your `_config.yml` file. To specify the file, add the following section to your
-`_config.yml` file:
+This plugin constructs a site-tree on every build and adds it to the local data of some pages,
+specified in your `_config.yml` file. If you don't specify any pages, the `site-tree` will be
+added to the scope of every page on the site.
+
+To specify the file, add the following section to your `_config.yml` file:
 
 ```yaml
-site_tree:
-  file: map.md
+site_tree.file: map.md
 ```
 
 where `map.md` is a file findable from the root of your jekyll sites source directory.
 If the file cannot be found or is unspecified, then the plugin logs a warning but doesn't
 interrupt the build process.
 
-`jekyll-site-tree` will inject a field named `site_tree` to the data of the page (as if you
-specified it in the header YAML) & you're expected to use it in the site-tree file. A minimal
-example of which would be:
+A minimal example of `map.md` would be:
 
 ```markdown
 ---
@@ -68,11 +67,15 @@ The default configuration for `jekyll-site-tree` looks like this:
 ```yaml
 site_tree:
   file: null
+  files: []
   extension: false
   collapse: false
   exclude: []
   substitute: []
 ```
+
+NOTE: `file` and `files` are essentially the same option. both exist purely for semantic
+      purposes and you can use either as a replacement or alognside the other.
 
 ### File Extensions
 By default `jekyll-site-tree` doesn't include the extension of files in the output tree.
@@ -142,7 +145,10 @@ site_tree.substitute:
     name: /\1
 ```
 
-the first pattern will omit any dates from posts files & the second wil replace any directory index files with the names of their parent directories (`/posts/index.html` becomes `/posts`).
+the first pattern will omit any dates from posts files & the second wil replace any directory index files
+with the names of their parent directories (`/posts/index.html` becomes `/posts`).
 
 ## TODO
-* Implement some proper unit testing. I just took this script outside of the local plugins for my git~~hub~~**lab** pages site, so I haven't added any unit/feature testing yet. Hopefully I'll get round to it (sooner, rather than later).
+* Implement some proper unit testing. I just took this script outside of the local plugins for my git~~hub~~**lab**
+pages site, so I haven't added any unit/feature testing yet. Hopefully I'll get round to it
+(sooner, rather than later).
