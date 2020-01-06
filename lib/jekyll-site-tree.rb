@@ -1,4 +1,5 @@
 require 'jekyll'
+require 'htmlentities'
 require 'natural_sort'
 
 module Jekyll
